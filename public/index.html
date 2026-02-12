@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔓 Prompt Escape — The AI Escape Room</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- ═══════════ TITLE SCREEN ═══════════ -->
+  <div id="title-screen" class="screen active">
+    <div class="title-art">
+      <div class="lock-icon">
+        <div class="lock-body"></div>
+        <div class="lock-shackle"></div>
+        <div class="lock-keyhole"></div>
+      </div>
+      <h1 class="game-title">PROMPT<br/>ESCAPE</h1>
+      <p class="game-subtitle">The AI Escape Room</p>
+      <p class="game-tagline">Craft the right prompts. Solve the puzzles. Escape.</p>
+    </div>
+
+    <div class="theme-select">
+      <h2>Choose Your Adventure</h2>
+      <div class="theme-cards" id="theme-cards">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+
+    <div class="title-footer">
+      <p>Built with GitHub Copilot &amp; WorkIQ MCP | TechConnect Hackathon 2026</p>
+    </div>
+  </div>
+
+  <!-- ═══════════ GAME SCREEN ═══════════ -->
+  <div id="game-screen" class="screen">
+    <!-- Top HUD -->
+    <div class="hud">
+      <div class="hud-left">
+        <span class="hud-theme" id="hud-theme">🏺 Indiana Jones</span>
+        <span class="hud-room" id="hud-room">Room 1/4</span>
+      </div>
+      <div class="hud-center">
+        <div class="hud-timer" id="hud-timer">00:00</div>
+      </div>
+      <div class="hud-right">
+        <span class="hud-score">Score: <strong id="hud-score">0</strong></span>
+        <span class="hud-attempts" id="hud-attempts">Attempts: 0/4</span>
+      </div>
+    </div>
+
+    <!-- Room Scene -->
+    <div class="room-scene" id="room-scene">
+      <div class="room-art" id="room-art">
+        <!-- CSS art rendered here based on theme/room -->
+      </div>
+      <div class="room-overlay" id="room-overlay"></div>
+    </div>
+
+    <!-- Room Info Panel -->
+    <div class="room-panel">
+      <div class="room-header">
+        <h2 class="room-name" id="room-name">The Temple Entrance</h2>
+        <div class="difficulty-badge" id="difficulty-badge">
+          <span class="star">★</span>
+        </div>
+      </div>
+      <p class="room-description" id="room-description">
+        <!-- Room narrative -->
+      </p>
+      <div class="puzzle-challenge" id="puzzle-challenge">
+        <div class="challenge-label">🧩 THE CHALLENGE</div>
+        <p class="challenge-text" id="challenge-text"></p>
+      </div>
+    </div>
+
+    <!-- Prompt Input -->
+    <div class="prompt-area">
+      <div class="prompt-input-wrapper">
+        <label for="prompt-input" class="prompt-label">Your Prompt:</label>
+        <textarea
+          id="prompt-input"
+          class="prompt-input"
+          rows="4"
+          placeholder="Write your prompt here... Be specific, creative, and cover the key concepts!"
+          spellcheck="false"
+        ></textarea>
+        <div class="prompt-actions">
+          <button class="btn btn-hint" id="btn-hint" title="Get a hint">
+            💡 Hint
+          </button>
+          <button class="btn btn-workiq" id="btn-workiq" title="Get a WorkIQ-powered hint from your M365 data">
+            📎 WorkIQ Hint
+          </button>
+          <button class="btn btn-submit" id="btn-submit">
+            🔓 Submit Prompt
+          </button>
+        </div>
+      </div>
+      <div class="char-count">
+        <span id="char-count">0</span> characters
+      </div>
+    </div>
+
+    <!-- Feedback Panel (shown after submission) -->
+    <div class="feedback-panel" id="feedback-panel">
+      <div class="feedback-header" id="feedback-header">
+        <!-- ✅ PASSED or ❌ FAILED -->
+      </div>
+      <div class="feedback-scores">
+        <div class="score-ring">
+          <svg viewBox="0 0 100 100">
+            <circle class="score-bg" cx="50" cy="50" r="40" />
+            <circle class="score-fill" id="score-ring-fill" cx="50" cy="50" r="40" />
+          </svg>
+          <div class="score-value" id="score-value">0</div>
+        </div>
+        <div class="score-breakdown">
+          <div class="score-item">
+            <span class="score-label">Relevance</span>
+            <div class="score-bar"><div class="score-bar-fill" id="bar-relevance"></div></div>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Specificity</span>
+            <div class="score-bar"><div class="score-bar-fill" id="bar-specificity"></div></div>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Creativity</span>
+            <div class="score-bar"><div class="score-bar-fill" id="bar-creativity"></div></div>
+          </div>
+        </div>
+      </div>
+      <p class="feedback-text" id="feedback-text"></p>
+      <div class="feedback-concepts" id="feedback-concepts">
+        <!-- concept pills -->
+      </div>
+      <button class="btn btn-continue" id="btn-continue" style="display:none">
+        ▶ Next Room
+      </button>
+    </div>
+
+    <!-- Hint Panel -->
+    <div class="hint-panel" id="hint-panel" style="display:none">
+      <div class="hint-content">
+        <span class="hint-icon">💡</span>
+        <p class="hint-text" id="hint-text"></p>
+        <p class="hint-context" id="hint-context" style="display:none"></p>
+      </div>
+      <button class="hint-close" id="hint-close">✕</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ VICTORY SCREEN ═══════════ -->
+  <div id="victory-screen" class="screen">
+    <div class="victory-content">
+      <div class="victory-art" id="victory-art">
+        <!-- Theme-specific victory animation -->
+      </div>
+      <h1 class="victory-title" id="victory-title">🔓 YOU ESCAPED!</h1>
+      <p class="victory-subtitle" id="victory-subtitle"></p>
+      <div class="victory-stats">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-score">0</div>
+          <div class="stat-label">Total Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-time">00:00</div>
+          <div class="stat-label">Time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-rooms">0</div>
+          <div class="stat-label">Rooms Cleared</div>
+        </div>
+      </div>
+      <div class="victory-actions">
+        <button class="btn btn-play-again" id="btn-play-again">🔄 Play Again</button>
+      </div>
+    </div>
+    <!-- Confetti / particles container -->
+    <div class="confetti-container" id="confetti-container"></div>
+  </div>
+
+  <!-- ═══════════ GAME OVER SCREEN ═══════════ -->
+  <div id="gameover-screen" class="screen">
+    <div class="gameover-content">
+      <div class="gameover-art">
+        <div class="skull">💀</div>
+      </div>
+      <h1 class="gameover-title">GAME OVER</h1>
+      <p class="gameover-text" id="gameover-text">The room claims another victim...</p>
+      <div class="gameover-actions">
+        <button class="btn btn-retry" id="btn-retry">🔄 Try Again</button>
+        <button class="btn btn-menu" id="btn-menu">🏠 Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
