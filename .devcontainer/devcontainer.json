@@ -1,0 +1,60 @@
+{
+  "name": "Prompt Escape",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
+  // VS Code extensions to install in the container
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "github.copilot-chat",
+        "ms-azuretools.vscode-azure-github-copilot",
+        "ms-azuretools.vscode-azure-mcp-server",
+        "ms-azuretools.vscode-azureappservice",
+        "ms-azuretools.vscode-azureresourcegroups",
+        "ms-vscode.vscode-node-azure-pack",
+        "ritwickdey.liveserver",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "github.copilot.nextEditSuggestions.enabled": true,
+        "chat.instructionsFilesLocations": {
+          ".github/instructions": true
+        },
+        "chat.useAgentSkills": true,
+        "chat.mcp.serverSampling": {
+          "Azure MCP Server Provider: Azure MCP": {
+            "allowedDuringChat": true
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+
+  // Features — installs Azure CLI, azd, and Python on top of the Node base image
+  "features": {
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/azure/azure-dev/azd:latest": {},
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.12"
+    },
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+
+  // Run after container creation: install deps, build, copy .env
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  // Forward the app port
+  "forwardPorts": [3001],
+  "portsAttributes": {
+    "3001": {
+      "label": "Prompt Escape",
+      "onAutoForward": "openBrowser"
+    }
+  },
+
+  // Run as non-root user
+  "remoteUser": "node"
+}
