@@ -1,6 +1,8 @@
 // ─── Core Game Types ─────────────────────────────────────────────
 
 export type ThemeId = 'indiana-jones' | 'harry-potter' | 'clippyland';
+export type GameMode = 'solo' | 'team' | 'versus';
+export type TeamSide = 'A' | 'B';
 
 export interface Theme {
   id: ThemeId;
@@ -61,6 +63,9 @@ export interface GameSession {
   completedRooms: CompletedRoom[];
   totalScore: number;
   status: 'playing' | 'escaped' | 'failed';
+  // Multiplayer fields (optional for solo)
+  lobbyCode?: string;
+  teamSide?: TeamSide;
 }
 
 export interface CompletedRoom {
@@ -69,6 +74,30 @@ export interface CompletedRoom {
   attempts: number;
   timeSpent: number;        // ms
   promptUsed: string;
+  playerName?: string;      // who submitted the winning prompt
+}
+
+// ─── Multiplayer ────────────────────────────────────────────────
+
+export interface Player {
+  id: string;
+  name: string;
+  team?: TeamSide;
+}
+
+export interface Lobby {
+  code: string;              // short join code e.g. "ABCD"
+  mode: GameMode;
+  themeId?: ThemeId;
+  hostId: string;
+  players: Player[];
+  status: 'waiting' | 'playing' | 'finished';
+  createdAt: number;
+  // Session IDs created when game starts
+  // Solo/Team: 1 session; Versus: 2 sessions (teamA, teamB)
+  sessionIds: string[];
+  // Versus mode winner
+  winner?: TeamSide | 'tie';
 }
 
 // ─── API ────────────────────────────────────────────────────────

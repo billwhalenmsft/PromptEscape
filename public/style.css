@@ -233,6 +233,343 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   MODE SELECTION & MULTIPLAYER UI
+   ═══════════════════════════════════════════════════════════════ */
+
+.mode-select, .mp-choice {
+  text-align: center;
+  padding: 1rem 1.5rem;
+}
+
+.mode-select h2, .mp-choice h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1rem;
+  color: var(--green);
+  margin-bottom: 1.5rem;
+}
+
+.mode-cards, .mp-choice-cards {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.mode-card, .mp-choice-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 200px;
+  text-align: center;
+}
+
+.mode-card:hover, .mp-choice-card:hover {
+  border-color: var(--green);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 255, 136, 0.15);
+}
+
+.mode-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.mode-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.8rem;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.mode-desc {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.btn-back {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s;
+  margin-top: 0.5rem;
+}
+
+.btn-back:hover {
+  border-color: var(--green);
+  color: white;
+}
+
+/* ─── Lobby UI ──────────────────────────────────────────────── */
+
+.lobby-create, .lobby-join, .lobby-waiting {
+  text-align: center;
+  padding: 1rem 1.5rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.lobby-create h2, .lobby-join h2, .lobby-waiting h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1rem;
+  color: var(--green);
+  margin-bottom: 1.5rem;
+}
+
+.lobby-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.lobby-label {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.lobby-input {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.lobby-input:focus {
+  border-color: var(--green);
+}
+
+.lobby-code-input {
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.5rem;
+  letter-spacing: 0.5rem;
+  text-transform: uppercase;
+}
+
+/* ─── Lobby Waiting Room ────────────────────────────────────── */
+
+.lobby-code-display {
+  background: var(--surface);
+  border: 2px dashed var(--green);
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  margin-bottom: 1.5rem;
+  display: inline-block;
+}
+
+.lobby-code-label {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.lobby-code-value {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 2rem;
+  color: var(--green);
+  letter-spacing: 0.5rem;
+}
+
+.lobby-mode-badge {
+  display: inline-block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-bottom: 1rem;
+}
+
+.lobby-theme-select {
+  margin-bottom: 1.5rem;
+}
+
+.lobby-theme-select h3 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-bottom: 0.75rem;
+}
+
+.lobby-theme-cards {
+  gap: 1rem;
+}
+
+.lobby-theme-cards .theme-card {
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+}
+
+.theme-card.selected {
+  border-color: var(--green);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.theme-card.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  color: var(--green);
+  font-size: 1.2rem;
+}
+
+.theme-card {
+  position: relative;
+}
+
+/* ─── Lobby Players ─────────────────────────────────────────── */
+
+.lobby-player-list {
+  margin-bottom: 1rem;
+}
+
+.lobby-player-list h3 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-bottom: 0.75rem;
+}
+
+.lobby-teams {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.lobby-team {
+  flex: 1;
+  max-width: 200px;
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 2px solid var(--border);
+}
+
+.lobby-team-a {
+  border-color: #ff4444;
+}
+
+.lobby-team-b {
+  border-color: #3498db;
+}
+
+.lobby-team h3 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.lobby-player {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.lobby-player.me {
+  border: 1px solid var(--green);
+}
+
+.player-name {
+  color: white;
+}
+
+.player-badge {
+  font-size: 0.7rem;
+}
+
+.you-badge {
+  color: var(--green);
+}
+
+.lobby-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+/* ─── Versus Scoreboard (in-game HUD) ──────────────────────── */
+
+.versus-scoreboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.vs-team {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.3rem 1rem;
+}
+
+.vs-team-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: var(--text-dim);
+}
+
+.vs-team-score {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1rem;
+  color: var(--green);
+}
+
+.vs-team-room {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+.vs-divider {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.8rem;
+  color: var(--purple);
+}
+
+.vs-team-a .vs-team-label { color: #ff4444; }
+.vs-team-b .vs-team-label { color: #3498db; }
+
+.hud-mode-badge {
+  display: inline-block;
+  background: var(--purple);
+  color: white;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    GAME SCREEN
    ═══════════════════════════════════════════════════════════════ */
 #game-screen {
@@ -1191,4 +1528,180 @@ body[data-theme="clippyland"] {
 }
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STATS DASHBOARD — Global Leaderboard
+   ═══════════════════════════════════════════════════════════════ */
+
+.stats-dashboard {
+  width: 100%;
+  max-width: 900px;
+  margin-top: 1rem;
+  text-align: center;
+  animation: fadeIn 0.6s ease;
+}
+
+.stats-dashboard h2 {
+  font-family: var(--font-game);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+/* ─── Totals Row ───────────────────────────────────────────── */
+.stats-totals {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stats-total-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1.2rem 0.8rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.stats-total-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03), transparent);
+  pointer-events: none;
+}
+.stats-total-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+.stats-total-value {
+  font-family: var(--font-game);
+  font-size: 1.4rem;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+}
+.stats-total-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.stats-total-card.success .stats-total-value { color: var(--success); }
+.stats-total-card.danger .stats-total-value { color: var(--danger); }
+.stats-total-card.accent .stats-total-value { color: var(--purple); }
+
+/* ─── Toggle Buttons ───────────────────────────────────────── */
+.stats-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.stats-toggle {
+  display: inline-flex;
+  background: var(--bg-card);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.stats-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.6rem 1.4rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.5px;
+}
+.stats-toggle-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+.stats-toggle-btn.active {
+  background: var(--accent);
+  color: var(--bg-dark);
+}
+
+/* ─── Stats Table ──────────────────────────────────────────── */
+.stats-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  background: var(--bg-card);
+}
+.stats-table th {
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-dim);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.stats-table td {
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  font-variant-numeric: tabular-nums;
+}
+.stats-table tr:last-child td { border-bottom: none; }
+.stats-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+.stats-name { font-weight: 600; white-space: nowrap; }
+.stat-esc { color: var(--success); }
+.stat-fail { color: var(--danger); }
+
+/* ─── Escape Rate Bar ──────────────────────────────────────── */
+.stats-rate-bar {
+  position: relative;
+  width: 100%;
+  min-width: 100px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.stats-rate-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success), var(--purple));
+  border-radius: 6px;
+  transition: width 0.8s ease;
+}
+.stats-rate-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* ─── Responsive Stats ─────────────────────────────────────── */
+@media (max-width: 600px) {
+  .stats-totals {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .stats-total-value {
+    font-size: 1rem;
+  }
+  .stats-table th,
+  .stats-table td {
+    padding: 0.6rem 0.5rem;
+    font-size: 0.8rem;
+  }
 }

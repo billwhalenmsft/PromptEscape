@@ -1,14 +1,18 @@
-import { GameSession, Theme, Room, EvaluationResult, CompletedRoom } from './types';
+import { GameSession, Theme, Room, EvaluationResult, CompletedRoom, TeamSide } from './types';
 import { evaluatePrompt } from './promptEvaluator';
 import { getTheme } from './themes';
 import { v4Fallback as generateId } from './utils';
 
 // ─── In-memory session store ────────────────────────────────────
 const sessions = new Map<string, GameSession>();
-const sessionTimers = new Map<string, number>(); // roomId → room start time
+const sessionTimers = new Map<string, number>(); // sessionId → room start time
 
 // ─── Start a new game ───────────────────────────────────────────
-export function startGame(themeId: string): { session: GameSession; room: Room; theme: Theme } {
+export function startGame(
+  themeId: string,
+  lobbyCode?: string,
+  teamSide?: TeamSide
+): { session: GameSession; room: Room; theme: Theme } {
   const theme = getTheme(themeId);
   if (!theme) throw new Error(`Unknown theme: ${themeId}`);
 
@@ -20,6 +24,8 @@ export function startGame(themeId: string): { session: GameSession; room: Room; 
     completedRooms: [],
     totalScore: 0,
     status: 'playing',
+    lobbyCode,
+    teamSide,
   };
 
   sessions.set(session.id, session);
@@ -31,7 +37,8 @@ export function startGame(themeId: string): { session: GameSession; room: Room; 
 // ─── Submit a prompt for the current room ───────────────────────
 export function submitPrompt(
   sessionId: string,
-  prompt: string
+  prompt: string,
+  playerName?: string
 ): { evaluation: EvaluationResult; session: GameSession; nextRoom?: Room } {
   const session = sessions.get(sessionId);
   if (!session) throw new Error('Session not found');
@@ -39,7 +46,8 @@ export function submitPrompt(
 
   const theme = getTheme(session.themeId)!;
   const currentRoom = theme.rooms[session.currentRoomIndex];
-  const attemptNumber = getAttemptCount(session, currentRoom.id) + 1;
+  // Server already called incrementAttempt before us, so just read the count
+  const attemptNumber = getAttemptCount(session, currentRoom.id);
 
   const evaluation = evaluatePrompt(prompt, currentRoom.puzzle, attemptNumber);
 
@@ -51,6 +59,7 @@ export function submitPrompt(
       attempts: attemptNumber,
       timeSpent: Date.now() - roomStart,
       promptUsed: prompt,
+      playerName,
     };
 
     session.completedRooms.push(completed);

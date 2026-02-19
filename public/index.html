@@ -21,10 +21,133 @@
       <p class="game-tagline">Craft the right prompts. Solve the puzzles. Escape.</p>
     </div>
 
-    <div class="theme-select">
+    <!-- ═══════════ MODE SELECTION ═══════════ -->
+    <div class="mode-select" id="mode-select">
+      <h2>Choose Your Mode</h2>
+      <div class="mode-cards">
+        <div class="mode-card" onclick="window._selectMode('solo')">
+          <span class="mode-icon">🧑</span>
+          <div class="mode-name">Solo</div>
+          <div class="mode-desc">1 player — classic escape room</div>
+        </div>
+        <div class="mode-card" onclick="window._selectMode('team')">
+          <span class="mode-icon">👥</span>
+          <div class="mode-name">Team</div>
+          <div class="mode-desc">Up to 4 players — work together</div>
+        </div>
+        <div class="mode-card" onclick="window._selectMode('versus')">
+          <span class="mode-icon">⚔️</span>
+          <div class="mode-name">Versus</div>
+          <div class="mode-desc">2 teams of up to 4 — head to head</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ SOLO: THEME SELECT ═══════════ -->
+    <div class="theme-select" id="theme-select" style="display:none">
       <h2>Choose Your Adventure</h2>
       <div class="theme-cards" id="theme-cards">
         <!-- Filled by JS -->
+      </div>
+      <button class="btn btn-back" id="btn-back-mode" onclick="window._backToModes()">← Back</button>
+    </div>
+
+    <!-- ═══════════ MULTIPLAYER: CREATE OR JOIN ═══════════ -->
+    <div class="mp-choice" id="mp-choice" style="display:none">
+      <h2 id="mp-choice-title">Team Mode</h2>
+      <div class="mp-choice-cards">
+        <div class="mp-choice-card" onclick="window._showCreateLobby()">
+          <span class="mode-icon">🏠</span>
+          <div class="mode-name">Create Lobby</div>
+          <div class="mode-desc">Host a game for others to join</div>
+        </div>
+        <div class="mp-choice-card" onclick="window._showJoinLobby()">
+          <span class="mode-icon">🔗</span>
+          <div class="mode-name">Join Lobby</div>
+          <div class="mode-desc">Enter a code to join a game</div>
+        </div>
+      </div>
+      <button class="btn btn-back" onclick="window._backToModes()">← Back</button>
+    </div>
+
+    <!-- ═══════════ CREATE LOBBY ═══════════ -->
+    <div class="lobby-create" id="lobby-create" style="display:none">
+      <h2>Create Lobby</h2>
+      <div class="lobby-form">
+        <label class="lobby-label">Your Name</label>
+        <input type="text" id="create-name" class="lobby-input" placeholder="Enter your name" maxlength="20" />
+        <button class="btn btn-submit" id="btn-create-lobby" onclick="window._createLobby()">Create</button>
+      </div>
+      <button class="btn btn-back" onclick="window._backToMpChoice()">← Back</button>
+    </div>
+
+    <!-- ═══════════ JOIN LOBBY ═══════════ -->
+    <div class="lobby-join" id="lobby-join" style="display:none">
+      <h2>Join Lobby</h2>
+      <div class="lobby-form">
+        <label class="lobby-label">Your Name</label>
+        <input type="text" id="join-name" class="lobby-input" placeholder="Enter your name" maxlength="20" />
+        <label class="lobby-label">Lobby Code</label>
+        <input type="text" id="join-code" class="lobby-input lobby-code-input" placeholder="ABCD" maxlength="4" />
+        <button class="btn btn-submit" id="btn-join-lobby" onclick="window._joinLobby()">Join</button>
+      </div>
+      <button class="btn btn-back" onclick="window._backToMpChoice()">← Back</button>
+    </div>
+
+    <!-- ═══════════ LOBBY WAITING ROOM ═══════════ -->
+    <div class="lobby-waiting" id="lobby-waiting" style="display:none">
+      <h2>Lobby</h2>
+      <div class="lobby-code-display">
+        <span class="lobby-code-label">Share this code:</span>
+        <span class="lobby-code-value" id="lobby-code-value">ABCD</span>
+      </div>
+      <div class="lobby-mode-badge" id="lobby-mode-badge">Team Mode</div>
+
+      <!-- Theme selection (host only) -->
+      <div class="lobby-theme-select" id="lobby-theme-select">
+        <h3>Select Theme</h3>
+        <div class="theme-cards lobby-theme-cards" id="lobby-theme-cards">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+
+      <!-- Player list -->
+      <div class="lobby-players" id="lobby-players">
+        <!-- Filled by JS -->
+      </div>
+
+      <!-- Actions -->
+      <div class="lobby-actions">
+        <button class="btn btn-submit" id="btn-start-lobby" onclick="window._startLobbyGame()" style="display:none">
+          ▶ Start Game
+        </button>
+        <button class="btn btn-back" onclick="window._leaveLobby()">Leave</button>
+      </div>
+    </div>
+
+    <!-- ═══════════ GLOBAL STATS DASHBOARD ═══════════ -->
+    <div class="stats-dashboard" id="stats-dashboard">
+      <h2>🌍 Global Leaderboard</h2>
+      <div class="stats-totals" id="stats-totals">
+        <!-- Filled by JS -->
+      </div>
+
+      <div class="stats-controls">
+        <div class="stats-toggle" id="stats-toggle">
+          <button class="stats-toggle-btn active" data-view="theme" onclick="window._switchStatsView('theme')">By Game</button>
+          <button class="stats-toggle-btn" data-view="region" onclick="window._switchStatsView('region')">By Region</button>
+        </div>
+      </div>
+
+      <div class="stats-table-wrapper">
+        <table class="stats-table" id="stats-table">
+          <thead id="stats-thead">
+            <!-- Filled by JS -->
+          </thead>
+          <tbody id="stats-tbody">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -40,6 +163,7 @@
       <div class="hud-left">
         <span class="hud-theme" id="hud-theme">🏺 Indiana Jones</span>
         <span class="hud-room" id="hud-room">Room 1/4</span>
+        <span class="hud-mode-badge" id="hud-mode-badge" style="display:none"></span>
       </div>
       <div class="hud-center">
         <div class="hud-timer" id="hud-timer">00:00</div>
@@ -47,6 +171,21 @@
       <div class="hud-right">
         <span class="hud-score">Score: <strong id="hud-score">0</strong></span>
         <span class="hud-attempts" id="hud-attempts">Attempts: 0/4</span>
+      </div>
+    </div>
+
+    <!-- Versus Scoreboard (shown only in versus mode) -->
+    <div class="versus-scoreboard" id="versus-scoreboard" style="display:none">
+      <div class="vs-team vs-team-a">
+        <span class="vs-team-label">🔴 Team A</span>
+        <span class="vs-team-score" id="vs-score-a">0</span>
+        <span class="vs-team-room" id="vs-room-a">Room 1</span>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-team vs-team-b">
+        <span class="vs-team-label">🔵 Team B</span>
+        <span class="vs-team-score" id="vs-score-b">0</span>
+        <span class="vs-team-room" id="vs-room-b">Room 1</span>
       </div>
     </div>
 
