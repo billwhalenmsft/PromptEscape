@@ -32,6 +32,7 @@ function resolveStatsDir(): string {
   const candidates = [
     process.env.STATS_DIR,
     process.env.HOME ? path.join(process.env.HOME, 'data') : undefined,
+    '/home/data',
     path.join(process.cwd(), 'data'),
     path.join(__dirname, '..', 'data'),
   ].filter((dir): dir is string => Boolean(dir));
@@ -51,6 +52,7 @@ function resolveStatsDir(): string {
 
 const STATS_DIR = resolveStatsDir();
 const STATS_FILE = path.join(STATS_DIR, STATS_FILE_NAME);
+console.log(`[Stats] Using stats file: ${STATS_FILE}`);
 
 // ─── In-memory stats store ──────────────────────────────────────
 // Key format: "themeId::region"
