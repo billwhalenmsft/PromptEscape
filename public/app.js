@@ -15,6 +15,7 @@
   let attemptCount = 0;
   let cachedStats = null;
   let statsView = 'theme'; // 'theme' | 'region'
+  let statsPollInterval = null;
 
   // Multiplayer state
   let gameMode = 'solo';       // 'solo' | 'team' | 'versus'
@@ -53,6 +54,7 @@
 
     // Load global stats
     await loadStats();
+    startStatsPolling();
 
     // Bind global events
     $('#btn-submit').addEventListener('click', handleSubmit);
@@ -67,6 +69,15 @@
     $('#prompt-input').addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.ctrlKey) handleSubmit();
     });
+  }
+
+  function startStatsPolling() {
+    if (statsPollInterval) clearInterval(statsPollInterval);
+    statsPollInterval = setInterval(() => {
+      if (screens.title.classList.contains('active')) {
+        loadStats();
+      }
+    }, 15000);
   }
 
   // ─── Render Theme Cards ─────────────────────────────────────
@@ -874,7 +885,13 @@
   async function loadStats() {
     try {
       const res = await fetch('/api/stats');
+      if (!res.ok) {
+        throw new Error(`Stats request failed: ${res.status}`);
+      }
       cachedStats = await res.json();
+      if (!cachedStats || !cachedStats.totals || !Array.isArray(cachedStats.byThemeAndRegion)) {
+        throw new Error('Invalid stats payload');
+      }
       renderStatsTotals(cachedStats.totals);
       renderStatsTable(cachedStats, statsView);
     } catch (err) {

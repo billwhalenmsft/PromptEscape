@@ -22,12 +22,35 @@ export interface StatsSnapshot {
 }
 
 // ─── Persistent file path ───────────────────────────────────────
-// On Azure App Service the /home directory is persistent across restarts.
-// Locally we fall back to a file in the project root.
-const STATS_DIR = process.env.HOME
-  ? path.join(process.env.HOME, 'data')
-  : path.join(__dirname, '..', 'data');
-const STATS_FILE = path.join(STATS_DIR, 'stats.json');
+// Priority order:
+// 1) Explicit STATS_DIR env override
+// 2) Azure App Service HOME/data (persists across restarts/upgrades)
+// 3) Workspace-local data directory
+const STATS_FILE_NAME = 'stats.json';
+
+function resolveStatsDir(): string {
+  const candidates = [
+    process.env.STATS_DIR,
+    process.env.HOME ? path.join(process.env.HOME, 'data') : undefined,
+    path.join(process.cwd(), 'data'),
+    path.join(__dirname, '..', 'data'),
+  ].filter((dir): dir is string => Boolean(dir));
+
+  for (const dir of candidates) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+      fs.accessSync(dir, fs.constants.W_OK);
+      return dir;
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error('[Stats] Could not resolve writable stats directory');
+}
+
+const STATS_DIR = resolveStatsDir();
+const STATS_FILE = path.join(STATS_DIR, STATS_FILE_NAME);
 
 // ─── In-memory stats store ──────────────────────────────────────
 // Key format: "themeId::region"
@@ -51,7 +74,7 @@ function loadFromDisk(): void {
   try {
     if (fs.existsSync(STATS_FILE)) {
       const raw = fs.readFileSync(STATS_FILE, 'utf-8');
-      const entries: ThemeRegionStats[] = JSON.parse(raw);
+      const entries = JSON.parse(raw) as ThemeRegionStats[];
       for (const entry of entries) {
         const k = key(entry.themeId, entry.region);
         stats.set(k, entry);
@@ -67,13 +90,29 @@ function loadFromDisk(): void {
 
 function saveToDisk(): void {
   try {
-    if (!fs.existsSync(STATS_DIR)) {
-      fs.mkdirSync(STATS_DIR, { recursive: true });
-    }
     const entries = Array.from(stats.values());
-    fs.writeFileSync(STATS_FILE, JSON.stringify(entries, null, 2), 'utf-8');
+    const tmpFile = `${STATS_FILE}.tmp`;
+    fs.writeFileSync(tmpFile, JSON.stringify(entries, null, 2), 'utf-8');
+    fs.renameSync(tmpFile, STATS_FILE);
   } catch (err) {
     console.error('[Stats] Failed to save stats to disk:', err);
+  }
+}
+
+function mergeFromDisk(): void {
+  try {
+    if (!fs.existsSync(STATS_FILE)) return;
+    const raw = fs.readFileSync(STATS_FILE, 'utf-8');
+    const diskEntries = JSON.parse(raw) as ThemeRegionStats[];
+
+    for (const diskEntry of diskEntries) {
+      const existing = getOrCreate(diskEntry.themeId, diskEntry.region);
+      existing.attempted = Math.max(existing.attempted, diskEntry.attempted || 0);
+      existing.escaped = Math.max(existing.escaped, diskEntry.escaped || 0);
+      existing.failed = Math.max(existing.failed, diskEntry.failed || 0);
+    }
+  } catch (err) {
+    console.error('[Stats] Failed to merge stats from disk:', err);
   }
 }
 
@@ -83,16 +122,19 @@ loadFromDisk();
 // ─── Tracking functions ─────────────────────────────────────────
 
 export function recordAttempt(themeId: ThemeId, region: string): void {
+  mergeFromDisk();
   getOrCreate(themeId, region).attempted++;
   saveToDisk();
 }
 
 export function recordEscape(themeId: ThemeId, region: string): void {
+  mergeFromDisk();
   getOrCreate(themeId, region).escaped++;
   saveToDisk();
 }
 
 export function recordFailure(themeId: ThemeId, region: string): void {
+  mergeFromDisk();
   getOrCreate(themeId, region).failed++;
   saveToDisk();
 }
@@ -100,6 +142,7 @@ export function recordFailure(themeId: ThemeId, region: string): void {
 // ─── Query ──────────────────────────────────────────────────────
 
 export function getStats(): StatsSnapshot {
+  mergeFromDisk();
   const entries = Array.from(stats.values());
 
   const totals = entries.reduce(
